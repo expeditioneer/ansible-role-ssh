@@ -1,0 +1,75 @@
+#
+# {{ ansible_managed }}
+#
+
+Protocol 2
+
+Port 22
+AddressFamily inet
+ListenAddress 0.0.0.0
+
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+ClientAliveInterval 300
+ClientAliveCountMax 2
+
+RekeyLimit 64M
+KexAlgorithms {{ ssh.kexalgorithms | join(',') }}
+Ciphers {{ ssh.ciphers | join(',') }}
+MACs {{ ssh.macs | join(',') }}
+
+SyslogFacility AUTHPRIV
+LogLevel INFO
+
+LoginGraceTime 60
+MaxAuthTries 3
+PermitRootLogin prohibit-password
+StrictModes yes
+MaxSessions 10
+maxstartups 10:30:60
+
+PubkeyAuthentication yes
+AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys
+AuthorizedKeysCommandUser nobody
+
+# HostbasedAuthentication
+HostbasedAuthentication no
+IgnoreRhosts yes
+
+# PasswordAuthentication
+PasswordAuthentication yes
+PermitEmptyPasswords no
+
+# ChallengeResponseAuthentication
+ChallengeResponseAuthentication no
+
+# GSSAPI options
+GSSAPIAuthentication no
+
+# Kerberos options
+KerberosAuthentication no
+
+# PAM
+UsePAM yes
+
+# Forwarding
+X11Forwarding no
+AllowAgentForwarding no
+AllowTcpForwarding no
+
+# Security
+PrintLastLog yes
+PermitUserEnvironment no
+
+# Banner
+Banner /etc/issue.net
+
+# Accept locale-related environment variables
+AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
+AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
+AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE
+AcceptEnv XMODIFIERS
+AcceptEnv COLORTERM
+
+# Subsytems
+Subsystem   sftp    /usr/lib64/misc/sftp-server

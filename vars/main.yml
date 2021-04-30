@@ -1,0 +1,15 @@
+---
+
+ssh:
+  hostkey_type: ed25519
+
+  kexalgorithms:
+    - curve25519-sha256@libssh.org
+
+  ciphers:
+    - aes256-gcm@openssh.com
+    - aes256-ctr
+
+  macs:
+    - hmac-sha2-512-etm@openssh.com
+    - hmac-sha2-512

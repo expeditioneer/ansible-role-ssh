@@ -1,0 +1,22 @@
+galaxy_info:
+  role_name: ssh
+  namespace: expeditioneer
+  author: Dennis Lamm
+  description: SSH configuration
+
+  license: GPL-3.0-only
+
+  min_ansible_version: 2.1
+
+  platforms:
+   - name: Gentoo
+     versions:
+     - all
+
+  galaxy_tags:
+    - access
+    - security
+    - ssh
+    - system
+
+dependencies: []

@@ -1,0 +1,70 @@
+---
+
+- name: assert that all necessary variables are defined
+  assert:
+    that:
+      - ssh.ciphers is defined
+      - ssh.hostkey_type is defined
+      - ssh.kexalgorithms is defined
+      - ssh.macs is defined
+
+- name: get all installed host keys
+  find:
+    paths: /etc/ssh
+    patterns: "^ssh_host_.*_key(.pub)?$"
+    excludes: "ssh_host_{{ ssh.hostkey_type }}_key(.pub)?$"
+    use_regex: yes
+  become: yes
+  register: installed_host_keys
+
+- name: remove unwanted host keys
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  become: yes
+  with_items: "{{ installed_host_keys['files'] }}"
+
+- name: remove Diffie-Hellman moduli
+  file:
+    path: /etc/ssh/moduli
+    state: absent
+  become: yes
+
+- name: create sshd configuration file
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0600
+    validate: /usr/sbin/sshd -t -f %s
+  become: yes
+  notify:
+    - restart sshd
+
+- name: create ssh configuration file
+  template:
+    src: ssh_config.j2
+    dest: /etc/ssh/ssh_config
+    owner: root
+    group: root
+    mode: 0644
+  become: yes
+
+- name: remove issue.logo file
+  file:
+    path: /etc/issue.logo
+    state: absent
+  become: yes
+
+- name: create /etc/issue and /etc/issue.net banner
+  template:
+    src: issue.j2
+    dest: '/etc/{{ item }}'
+    owner: root
+    group: root
+    mode: 0644
+  become: yes
+  with_items:
+    - issue
+    - issue.net

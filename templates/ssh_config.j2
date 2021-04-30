@@ -1,0 +1,34 @@
+#
+# {{ ansible_managed }}
+#
+
+HashKnownHosts yes
+
+CanonicalizeHostname yes
+{#CanonicalDomains #}
+CanonicalizeFallbackLocal no
+
+SendEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
+SendEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
+SendEnv LC_IDENTIFICATION LC_ALL LANGUAGE
+SendEnv XMODIFIERS COLORTERM
+
+Host *
+    ConnectTimeout 30
+    KexAlgorithms {{ ssh.kexalgorithms | join(',') }}
+    Ciphers {{ ssh.ciphers | join(',') }}
+    MACs {{ ssh.macs | join(',') }}
+
+    ControlMaster auto
+    ControlPersist no
+    ControlPath none
+
+    PasswordAuthentication yes
+    ChallengeResponseAuthentication no
+    PubkeyAuthentication yes
+    GSSAPIAuthentication no
+
+    ServerAliveInterval 300
+    ServerAliveCountMax 2
+
+    ForwardX11 no
