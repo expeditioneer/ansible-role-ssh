@@ -1,0 +1,55 @@
+---
+
+- name: create systemd files for sshd-keygen
+  ansible.builtin.copy:
+    src: '{{ item }}'
+    dest: "/etc/systemd/system/{{ item | replace('_at', '@') }}"
+    owner: root
+    group: root
+    mode: 0644
+  become: yes
+  loop:
+    - sshd-keygen.target
+    - sshd-keygen_at.service
+
+- name: create necessary systemd override directories for sshd service and socket
+  ansible.builtin.file:
+    path: '/etc/systemd/system/{{ item }}.d'
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  become: yes
+  loop:
+    - sshd.socket
+    - sshd.service
+
+- name: create systemd overrides for sshd service and socket
+  ansible.builtin.copy:
+    src: '{{ item }}'
+    dest: '/etc/systemd/system/{{ item }}.d/override.conf'
+    owner: root
+    group: root
+    mode: 0644
+  become: yes
+  loop:
+    - sshd.socket
+    - sshd.service
+
+- name: create sshd-keygen script
+  ansible.builtin.copy:
+    src: sshd-keygen
+    dest: /usr/libexec/sshd-keygen
+    owner: root
+    group: root
+    mode: 0644
+  become: yes
+
+- name: mask systemd service for key creation of RSA and ECDSA keys
+  ansible.builtin.systemd:
+    name: '{{ item }}'
+    masked: yes
+  become: yes
+  loop:
+    - sshd-keygen@rsa.service
+    - sshd-keygen@ecdsa.service

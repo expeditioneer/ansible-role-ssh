@@ -1,0 +1,28 @@
+---
+
+- name: create portage patches directory for 'net-misc/openssl'
+  ansible.builtin.file:
+    path: /etc/portage/patches/net-misc/openssh
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  become: yes
+
+- name: create systemd-notify patch
+  ansible.builtin.copy:
+    src: systemd-notify.patch
+    dest: /etc/portage/patches/net-misc/openssh/systemd-notify.patch
+    owner: root
+    group: root
+    mode: 0644
+  become: yes
+  register: patch
+
+- name: re-install OpenBSD SSH
+  community.general.portage:
+    name:
+      - net-misc/openssh
+    changed_use: yes
+  become: yes
+  when: patch.changed

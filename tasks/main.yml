@@ -1,15 +1,19 @@
 ---
 
 - name: assert that all necessary variables are defined
-  assert:
+  ansible.builtin.assert:
     that:
       - ssh.ciphers is defined
       - ssh.hostkey_type is defined
       - ssh.kexalgorithms is defined
       - ssh.macs is defined
 
+- import_tasks: ssh-install.yml
+
+- import_tasks: ssh-systemd-integration.yml
+
 - name: get all installed host keys
-  find:
+  ansible.builtin.find:
     paths: /etc/ssh
     patterns: "^ssh_host_.*_key(.pub)?$"
     excludes: "ssh_host_{{ ssh.hostkey_type }}_key(.pub)?$"
@@ -18,20 +22,20 @@
   register: installed_host_keys
 
 - name: remove unwanted host keys
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     state: absent
   become: yes
   with_items: "{{ installed_host_keys['files'] }}"
 
 - name: remove Diffie-Hellman moduli
-  file:
+  ansible.builtin.file:
     path: /etc/ssh/moduli
     state: absent
   become: yes
 
 - name: create sshd configuration file
-  template:
+  ansible.builtin.template:
     src: sshd_config.j2
     dest: /etc/ssh/sshd_config
     owner: root
@@ -43,7 +47,7 @@
     - restart sshd
 
 - name: create ssh configuration file
-  template:
+  ansible.builtin.template:
     src: ssh_config.j2
     dest: /etc/ssh/ssh_config
     owner: root
