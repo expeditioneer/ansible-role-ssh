@@ -24,5 +24,6 @@
     name:
       - net-misc/openssh
     changed_use: yes
+    noreplace: no
   become: yes
   when: patch.changed
